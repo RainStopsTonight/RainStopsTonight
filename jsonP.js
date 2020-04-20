@@ -1,35 +1,22 @@
-function jsonP(url, cfg) {
-      var apiUrl;
-      if (typeof url === "object") {
-        cfg = url;
-        apiUrl = url.url;
-      } else {
-        apiUrl = url;
-      }
-      if (typeof cfg === "function") {
-        cfg = {
-          success: cfg,
-          error: function() { },
-          data: {}
-        };
-      } else {
-        cfg = this.extend(
+function jsonP(url) {
+      if (typeof url !== 'object' || url === null)  return
+      var apiUrl;apiUrl = url.url;
+      url = Object.assign({
           {
             success: function() { },
             error: function() { },
             data: {}
           },
-          cfg
-        );
-      }
+          url
+      })
       var _rnNum =
         +new Date() +
         Math.random()
           .toString()
           .replace("0.", "");
-      var prefix = cfg.prefix || "sinajp_";
-      var id = cfg.jsonpCallback || cfg.jsonpCallBack || prefix + _rnNum;
-
+      var prefix = cfg.prefix || "xxxjp_";
+      var jsonpCallback = url.jsonpCallback
+      
       var param = cfg.param || "callback";
       var timeout = null != cfg.timeout ? cfg.timeout : 10000;
       var enc = encodeURIComponent;
@@ -45,17 +32,17 @@ function jsonP(url, cfg) {
 
       function cleanup() {
         if (script.parentNode) script.parentNode.removeChild(script);
-        window[id] = null;
+        window[jsonpCallback] = null;
         if (timer) clearTimeout(timer);
       }
 
       function cancel() {
-        if (window[id]) {
+        if (window[jsonpCallback]) {
           cleanup();
         }
       }
 
-      window[id] = function(data) {
+      window[jsonpCallback] = function(data) {
         // debug('jsonp got', data);
         cleanup();
         // if (fn) fn(null, data);
@@ -70,7 +57,7 @@ function jsonP(url, cfg) {
         "&" +
         param +
         "=" +
-        enc(id);
+        enc(jsonpCallback);
       apiUrl = apiUrl.replace("?&", "?").replace("&&", "&");
 
       // debug('jsonp req "%s"', url);
