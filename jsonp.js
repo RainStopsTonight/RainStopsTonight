@@ -9,7 +9,7 @@ function jsonp(obj) {
     if (typeof obj.parames == 'object') {
         var arr = new Array();
         for (var key in obj.parames) {
-            arr.push(key + '=' + obj.parames[key])
+            arr.push(key + '=' + obj.parames[key]);
         }
         obj.parames = arr.join('&');
     }
@@ -22,14 +22,14 @@ function jsonp(obj) {
 
     //这里必须这样写window[callbackName];
     //如果写window.callbackName会报错没有定义
-    window[callbackName] = function(res) {
+    window[callbackName] = function (res) {
         obj.success(res);
         //删除的时候可以这样写
         //由于请求一次会创建一个script标签和一个函数，所以每次获取到结果后就删除
         delete window.callbackName;
         document.body.removeChild(scriptObj);
-    }
-        
+    };
+
 
 
     jsonp({
@@ -40,23 +40,23 @@ function jsonp(obj) {
             id: 1
         },
         //成功回调
-        success: function(res) {
-            console.log(res)
+        success: function (res) {
+            console.log(res);
         }
-    })
+    });
 
 
-// Server
-    app.get('/api', function(req, res) {
+    // Server
+    app.get('/api', function (req, res) {
         var data = {
             name: "王八",
             age: 100
-        }
+        };
         //返回的类型必须设置为javascript
-        res.type('text/javascript')
+        res.type('text/javascript');
         //前端路由中的参数获取，req.query。
         console.log("query", req.query);
-        res.send(req.query.callback + '(' + JSON.stringify(data) + ')')
+        res.send(req.query.callback + '(' + JSON.stringify(data) + ')');
         //这里的数据必须转化为字符串，否则传入一个对象浏览器无法解析
         // res.send(req.query.callback+'(' +data+')')
-    })
+    });
